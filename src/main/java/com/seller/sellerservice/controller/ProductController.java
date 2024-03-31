@@ -40,4 +40,13 @@ public class ProductController {
             System.out.println(product.toString());
         return ResponseEntity.ok(productList);
     }
+    @GetMapping("/{userId}/{productId}")
+    public ResponseEntity<?> getProductById(@PathVariable Long userId, @PathVariable Long productId){
+        try{
+            Product product = productService.getProductById(userId, productId);
+            return new ResponseEntity<>(product, HttpStatus.OK);
+        }catch (IllegalArgumentException ex){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

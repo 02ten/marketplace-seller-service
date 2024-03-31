@@ -16,6 +16,8 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,27 +41,57 @@ class SellerServiceApplicationTests {
 
         Assertions.assertTrue(new ReflectionEquals(expectedProduct).matches(actualProduct));
     }
+
     @Test
-    void createProduct_withInvalidName_ThrowsIllegalArgumentException(){
+    void createProduct_withInvalidName_ThrowsIllegalArgumentException() {
         ProductDTO productDTO = new ProductDTO("invalidName", 299.99, "validDescription", 1L);
-        Assertions.assertThrows(IllegalArgumentException.class, ()->productService.createProduct(1L, productDTO));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.createProduct(1L, productDTO));
     }
+
     @Test
-    void createProduct_withInvalidCategoryId_ThrowsIllegalArgumentException(){
+    void createProduct_withInvalidCategoryId_ThrowsIllegalArgumentException() {
         ProductDTO productDTO = new ProductDTO("validName", 299.99, "validDescription", 1L);
         Mockito.when(categoryService.getCategoryById(productDTO.getCategoryId())).thenReturn(Optional.empty());
-        Assertions.assertThrows(IllegalArgumentException.class, ()->productService.createProduct(1L, productDTO));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.createProduct(1L, productDTO));
     }
+
     @Test
-    void deleteProduct_withValidProductIdAndUserId_Checking(){
-        Mockito.when(productRepository.existsByIdAndUserId(1L,1L)).thenReturn(true);
+    void deleteProduct_withValidProductIdAndUserId_Checking() {
+        Mockito.when(productRepository.existsByIdAndUserId(1L, 1L)).thenReturn(true);
         productService.deleteProduct(1L, 1L);
         Mockito.verify(productRepository).deleteById(1L);
     }
+
     @Test
-    void deleteProduct_withInvalidProductIdAndUserId_ThrowsIllegalArgumentException(){
-        Mockito.when(productRepository.existsByIdAndUserId(1L,1L)).thenReturn(false);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(1L,1L));
+    void deleteProduct_withInvalidProductIdAndUserId_ThrowsIllegalArgumentException() {
+        Mockito.when(productRepository.existsByIdAndUserId(1L, 1L)).thenReturn(false);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(1L, 1L));
     }
 
+    @Test
+    void getProductList_withValidUserId_returnsListProduct() {
+        Product product1 = new Product(1L, "validName", 299.99, "validDescription", 1L, new Category());
+        Product product2 = new Product(2L, "validName", 299.99, "validDescription", 1L, new Category());
+        Product product3 = new Product(3L, "validName", 299.99, "validDescription", 1L, new Category());
+        List<Product> expectedList = new ArrayList<>(List.of(product1, product2, product3));
+        Mockito.when(productRepository.findProductsByUserId(1L)).thenReturn(new ArrayList<>(List.of(product1, product2, product3)));
+        List<Product> actualList = productService.getAllProducts(1L);
+        Assertions.assertArrayEquals(expectedList.toArray(), actualList.toArray());
+    }
+
+    @Test
+    void getProduct_withValidUserIdAndProductId_returnsProduct() {
+        Category category = new Category(1, "category1", null);
+        Product expectedProduct = new Product(1L, "validName", 299.99, "validDescription", 1L, category);
+        Mockito.when(productRepository.existsByIdAndUserId(1L, 1L)).thenReturn(true);
+        Mockito.when(productRepository.findProductByIdAndUserId(1L, 1L)).thenReturn(new Product
+                (1L, "validName", 299.99, "validDescription", 1L, category));
+        Product actualProduct = productService.getProductById(1L,1L);
+        Assertions.assertTrue(new ReflectionEquals(expectedProduct).matches(actualProduct));
+    }
+    @Test
+    void getProduct_withInvalidUserIdAndProductId_ThrowsIllegalArgumentException(){
+        Mockito.when(productRepository.existsByIdAndUserId(1L,1L)).thenReturn(false);
+        Assertions.assertThrows(IllegalArgumentException.class, ()->productService.getProductById(1L,1L));
+    }
 }

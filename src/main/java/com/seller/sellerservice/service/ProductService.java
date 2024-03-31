@@ -55,4 +55,13 @@ public class ProductService {
         log.info("Getting all products by user id");
         return productRepository.findProductsByUserId(userId);
     }
+    public Product getProductById(Long userId, Long productId){
+        log.info("Getting product by id");
+        if(!productRepository.existsByIdAndUserId(productId, userId)){
+            log.error("Not found product with such product id");
+            throw new IllegalArgumentException("У вас нет такого товара");
+        }
+        log.info("Successful getting product by id");
+        return productRepository.findProductByIdAndUserId(productId, userId);
+    }
 }
