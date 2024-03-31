@@ -1,9 +1,9 @@
 package com.seller.sellerservice.controller;
 
 import com.seller.sellerservice.dto.ProductDTO;
-import com.seller.sellerservice.entity.Product;
 import com.seller.sellerservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,14 +13,13 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
     private final ProductService productService;
     @PostMapping("/{userId}")
-    public ResponseEntity<Product> addNewProduct(@PathVariable Long userId, ProductDTO productDTO){
-        Product product;
+    public ResponseEntity<String> addNewProduct(@PathVariable Long userId, @RequestBody ProductDTO productDTO){
         try{
-             product = productService.createProduct(userId, productDTO);
+             productService.createProduct(userId, productDTO);
+             return new ResponseEntity<>("Товар добавлен", HttpStatus.CREATED);
         }catch (IllegalArgumentException ex){
-            product = null;
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(product);
     }
 
 }
