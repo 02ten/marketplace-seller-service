@@ -21,5 +21,15 @@ public class ProductController {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    @DeleteMapping("/{userId}/{productId}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long userId, @PathVariable Long productId){
+        try{
+            productService.deleteProduct(userId, productId);
+            return new ResponseEntity<>("Товар успешно удален", HttpStatus.OK);
+        }catch (IllegalArgumentException ex){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.OK);
+        }
+
+    }
 
 }

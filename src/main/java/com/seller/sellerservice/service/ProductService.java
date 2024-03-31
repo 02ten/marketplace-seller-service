@@ -40,4 +40,13 @@ public class ProductService {
         productRepository.save(product);
         return product;
     }
+    public void deleteProduct(Long userId, Long productId){
+        log.info("Deleting product");
+        if(!productRepository.existsByIdAndUserId(productId, userId)){
+            log.error("No such product with that productId and userId");
+            throw new IllegalArgumentException("У вас нет такого товара");
+        }
+        productRepository.deleteById(productId);
+
+    }
 }
