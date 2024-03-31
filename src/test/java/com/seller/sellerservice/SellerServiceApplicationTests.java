@@ -50,4 +50,16 @@ class SellerServiceApplicationTests {
         Mockito.when(categoryService.getCategoryById(productDTO.getCategoryId())).thenReturn(Optional.empty());
         Assertions.assertThrows(IllegalArgumentException.class, ()->productService.createProduct(1L, productDTO));
     }
+    @Test
+    void deleteProduct_withValidProductIdAndUserId_Checking(){
+        Mockito.when(productRepository.existsByIdAndUserId(1L,1L)).thenReturn(true);
+        productService.deleteProduct(1L, 1L);
+        Mockito.verify(productRepository).deleteById(1L);
+    }
+    @Test
+    void deleteProduct_withInvalidProductIdAndUserId_ThrowsIllegalArgumentException(){
+        Mockito.when(productRepository.existsByIdAndUserId(1L,1L)).thenReturn(false);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(1L,1L));
+    }
+
 }
