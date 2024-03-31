@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,7 +47,12 @@ public class ProductService {
             log.error("No such product with that productId and userId");
             throw new IllegalArgumentException("У вас нет такого товара");
         }
+        log.info("Deletion successful");
         productRepository.deleteById(productId);
 
+    }
+    public List<Product> getAllProducts(Long userId){
+        log.info("Getting all products by user id");
+        return productRepository.findProductsByUserId(userId);
     }
 }

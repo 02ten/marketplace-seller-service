@@ -1,11 +1,14 @@
 package com.seller.sellerservice.controller;
 
 import com.seller.sellerservice.dto.ProductDTO;
+import com.seller.sellerservice.entity.Product;
 import com.seller.sellerservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/product")
@@ -29,7 +32,12 @@ public class ProductController {
         }catch (IllegalArgumentException ex){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.OK);
         }
-
     }
-
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Product>> getAllProducts(@PathVariable Long userId){
+        List<Product> productList = productService.getAllProducts(userId);
+        for(Product product: productList)
+            System.out.println(product.toString());
+        return ResponseEntity.ok(productList);
+    }
 }
