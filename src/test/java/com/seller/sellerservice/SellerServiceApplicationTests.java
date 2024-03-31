@@ -39,4 +39,15 @@ class SellerServiceApplicationTests {
 
         Assertions.assertTrue(new ReflectionEquals(expectedProduct).matches(actualProduct));
     }
+    @Test
+    void createProduct_withInvalidName_ThrowsIllegalArgumentException(){
+        ProductDTO productDTO = new ProductDTO("invalidName", 299.99, "validDescription", 1L);
+        Assertions.assertThrows(IllegalArgumentException.class, ()->productService.createProduct(1L, productDTO));
+    }
+    @Test
+    void createProduct_withInvalidCategoryId_ThrowsIllegalArgumentException(){
+        ProductDTO productDTO = new ProductDTO("validName", 299.99, "validDescription", 1L);
+        Mockito.when(categoryService.getCategoryById(productDTO.getCategoryId())).thenReturn(Optional.empty());
+        Assertions.assertThrows(IllegalArgumentException.class, ()->productService.createProduct(1L, productDTO));
+    }
 }
