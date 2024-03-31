@@ -17,6 +17,7 @@ public class ProductService {
         product.setPrice(productDTO.getPrice());
         product.setDescription(productDTO.getDescription());
         product.setUserId(id);
+        productRepository.save(product);
         return product;
     }
 }
