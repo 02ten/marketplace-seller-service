@@ -15,35 +15,50 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+
     @PostMapping("/{userId}")
-    public ResponseEntity<String> addNewProduct(@PathVariable Long userId, @RequestBody ProductDTO productDTO){
-        try{
-             productService.createProduct(userId, productDTO);
-             return new ResponseEntity<>("Товар добавлен", HttpStatus.CREATED);
-        }catch (IllegalArgumentException ex){
+    public ResponseEntity<String> addNewProduct(@PathVariable Long userId, @RequestBody ProductDTO productDTO) {
+        try {
+            productService.createProduct(userId, productDTO);
+            return new ResponseEntity<>("Товар добавлен", HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
     @DeleteMapping("/{userId}/{productId}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long userId, @PathVariable Long productId){
-        try{
+    public ResponseEntity<String> deleteProduct(@PathVariable Long userId, @PathVariable Long productId) {
+        try {
             productService.deleteProduct(userId, productId);
             return new ResponseEntity<>("Товар успешно удален", HttpStatus.OK);
-        }catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.OK);
         }
     }
+
     @GetMapping("/{userId}")
-    public ResponseEntity<List<Product>> getAllProducts(@PathVariable Long userId){
+    public ResponseEntity<List<Product>> getAllProducts(@PathVariable Long userId) {
         List<Product> productList = productService.getAllProducts(userId);
-        for(Product product: productList)
+        for (Product product : productList)
             System.out.println(product.toString());
         return ResponseEntity.ok(productList);
     }
+
     @GetMapping("/{userId}/{productId}")
-    public ResponseEntity<?> getProductById(@PathVariable Long userId, @PathVariable Long productId){
-        try{
+    public ResponseEntity<?> getProductById(@PathVariable Long userId, @PathVariable Long productId) {
+        try {
             Product product = productService.getProductById(userId, productId);
+            return new ResponseEntity<>(product, HttpStatus.OK);
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/{userId}/{productId}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long userId, @PathVariable Long productId,
+                                           @RequestBody ProductDTO updatedProduct) {
+        try{
+            Product product = productService.updateProduct(userId, productId, updatedProduct);
             return new ResponseEntity<>(product, HttpStatus.OK);
         }catch (IllegalArgumentException ex){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);

@@ -37,8 +37,6 @@ class SellerServiceApplicationTests {
         Mockito.when(productRepository.existsByNameAndUserId(productDTO.getName(), 1L)).thenReturn(false);
         Mockito.when(categoryService.getCategoryById(productDTO.getCategoryId())).thenReturn(Optional.of(category));
         Product actualProduct = productService.createProduct(1L, productDTO);
-        System.out.println(actualProduct.toString());
-
         Assertions.assertTrue(new ReflectionEquals(expectedProduct).matches(actualProduct));
     }
 
@@ -93,5 +91,31 @@ class SellerServiceApplicationTests {
     void getProduct_withInvalidUserIdAndProductId_ThrowsIllegalArgumentException(){
         Mockito.when(productRepository.existsByIdAndUserId(1L,1L)).thenReturn(false);
         Assertions.assertThrows(IllegalArgumentException.class, ()->productService.getProductById(1L,1L));
+    }
+    @Test
+    void updateProduct_withValidName_ReturnsProduct() {
+        Category category = new Category(1L, "category", null);
+        Product expectedProduct = new Product(1L, "newName", 299.99, "validDescription", 1L, category);
+        ProductDTO productDTO = new ProductDTO("newName", 299.99, "validDescription", 1L);
+        Mockito.when(productRepository.existsByNameAndUserId(productDTO.getName(), 1L)).thenReturn(false);
+        Mockito.when(categoryService.getCategoryById(productDTO.getCategoryId())).thenReturn(Optional.of(category));
+        Mockito.when(productRepository.existsByIdAndUserId(1L,1L)).thenReturn(true);
+        Product actualProduct = productService.updateProduct(1L,1L, productDTO);
+        System.out.println(actualProduct.toString());
+        System.out.println(expectedProduct.toString());
+        Assertions.assertTrue(new ReflectionEquals(expectedProduct).matches(actualProduct));
+    }
+
+    @Test
+    void updateProduct_withInvalidName_ThrowsIllegalArgumentException() {
+        ProductDTO productDTO = new ProductDTO("invalidName", 299.99, "validDescription", 1L);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.createProduct(1L, productDTO));
+    }
+
+    @Test
+    void updateProduct_withInvalidCategoryId_ThrowsIllegalArgumentException() {
+        ProductDTO productDTO = new ProductDTO("validName", 299.99, "validDescription", 1L);
+        Mockito.when(categoryService.getCategoryById(productDTO.getCategoryId())).thenReturn(Optional.empty());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.createProduct(1L, productDTO));
     }
 }
