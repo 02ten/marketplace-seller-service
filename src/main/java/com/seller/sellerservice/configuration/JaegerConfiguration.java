@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class JaegerConfiguration {
     @Bean
-    public Tracer jaegerTracer(){
+    public Tracer jaegerTracer() {
         return new io.jaegertracing.Configuration("AuthService")
                 .withSampler(new io.jaegertracing.Configuration.SamplerConfiguration().withType("const").withParam(1))
                 .withReporter(new io.jaegertracing.Configuration.ReporterConfiguration()

@@ -19,11 +19,12 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
     private final Tracer tracer;
+
     @PostMapping("/{userId}")
     public ResponseEntity<String> addNewProduct(@PathVariable Long userId, @RequestBody ProductDTO productDTO) {
         Span span = tracer.buildSpan("Adding new product").start();
         Tags.HTTP_METHOD.set(span, "POST");
-        Tags.HTTP_URL.set(span, "/api/product/"+userId);
+        Tags.HTTP_URL.set(span, "/api/product/" + userId);
         span.finish();
         try {
             productService.createProduct(userId, productDTO);
@@ -37,7 +38,7 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable Long userId, @PathVariable Long productId) {
         Span span = tracer.buildSpan("Delete product").start();
         Tags.HTTP_METHOD.set(span, "DELETE");
-        Tags.HTTP_URL.set(span, "/api/product/"+userId+"/"+productId);
+        Tags.HTTP_URL.set(span, "/api/product/" + userId + "/" + productId);
         span.finish();
         try {
             productService.deleteProduct(userId, productId);
@@ -51,7 +52,7 @@ public class ProductController {
     public ResponseEntity<List<Product>> getAllProducts(@PathVariable Long userId) {
         Span span = tracer.buildSpan("Get all products").start();
         Tags.HTTP_METHOD.set(span, "GET");
-        Tags.HTTP_URL.set(span, "/api/product/"+userId);
+        Tags.HTTP_URL.set(span, "/api/product/" + userId);
         span.finish();
         List<Product> productList = productService.getAllProducts(userId);
         for (Product product : productList)
@@ -63,7 +64,7 @@ public class ProductController {
     public ResponseEntity<?> getProductById(@PathVariable Long userId, @PathVariable Long productId) {
         Span span = tracer.buildSpan("Get product").start();
         Tags.HTTP_METHOD.set(span, "GET");
-        Tags.HTTP_URL.set(span, "/api/product/"+userId+"/"+productId);
+        Tags.HTTP_URL.set(span, "/api/product/" + userId + "/" + productId);
         span.finish();
         try {
             Product product = productService.getProductById(userId, productId);
@@ -78,12 +79,12 @@ public class ProductController {
                                            @RequestBody ProductDTO updatedProduct) {
         Span span = tracer.buildSpan("Update product").start();
         Tags.HTTP_METHOD.set(span, "PUT");
-        Tags.HTTP_URL.set(span, "/api/product/"+userId+"/"+productId);
+        Tags.HTTP_URL.set(span, "/api/product/" + userId + "/" + productId);
         span.finish();
-        try{
+        try {
             Product product = productService.updateProduct(userId, productId, updatedProduct);
             return new ResponseEntity<>(product, HttpStatus.OK);
-        }catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

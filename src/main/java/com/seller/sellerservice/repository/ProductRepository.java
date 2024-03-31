@@ -7,7 +7,10 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByNameAndUserId(String name, Long id);
+
     boolean existsByIdAndUserId(Long id, Long userId);
+
     List<Product> findProductsByUserId(Long id);
+
     Product findProductByIdAndUserId(Long id, Long userId);
 }

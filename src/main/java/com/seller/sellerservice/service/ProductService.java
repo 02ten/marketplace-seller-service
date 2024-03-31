@@ -18,7 +18,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
 
-    public Product createProduct(Long userId, ProductDTO productDTO) throws IllegalArgumentException{
+    public Product createProduct(Long userId, ProductDTO productDTO) throws IllegalArgumentException {
         log.info("Creating new product");
         Category category = checkingNameProductAndExistingCategory(userId, productDTO);
         Product product = new Product();
@@ -31,9 +31,10 @@ public class ProductService {
         productRepository.save(product);
         return product;
     }
-    public void deleteProduct(Long userId, Long productId){
+
+    public void deleteProduct(Long userId, Long productId) {
         log.info("Deleting product");
-        if(!productRepository.existsByIdAndUserId(productId, userId)){
+        if (!productRepository.existsByIdAndUserId(productId, userId)) {
             log.error("No such product with that productId and userId");
             throw new IllegalArgumentException("У вас нет такого товара");
         }
@@ -41,17 +42,20 @@ public class ProductService {
         productRepository.deleteById(productId);
 
     }
-    public List<Product> getAllProducts(Long userId){
+
+    public List<Product> getAllProducts(Long userId) {
         log.info("Getting all products by user id");
         return productRepository.findProductsByUserId(userId);
     }
-    public Product getProductById(Long userId, Long productId){
+
+    public Product getProductById(Long userId, Long productId) {
         log.info("Getting product by id");
         checkingExistingByIdAndUserId(productId, userId);
         log.info("Successful getting product by id");
         return productRepository.findProductByIdAndUserId(productId, userId);
     }
-    public Product updateProduct(Long userId, Long id, ProductDTO updatedProduct) throws IllegalArgumentException{
+
+    public Product updateProduct(Long userId, Long id, ProductDTO updatedProduct) throws IllegalArgumentException {
         log.info("Updating product");
         checkingExistingByIdAndUserId(id, userId);
         Category category = checkingNameProductAndExistingCategory(userId, updatedProduct);
@@ -66,20 +70,22 @@ public class ProductService {
         productRepository.save(product);
         return product;
     }
-    private Category checkingNameProductAndExistingCategory(Long userId, ProductDTO productDTO){
+
+    private Category checkingNameProductAndExistingCategory(Long userId, ProductDTO productDTO) {
         if (productRepository.existsByNameAndUserId(productDTO.getName(), userId)) {
             log.error("Cannot create product with existing name");
             throw new IllegalArgumentException("У вас уже есть товар с таким названием");
         }
         Optional<Category> category = categoryService.getCategoryById(productDTO.getCategoryId());
-        if(category.isEmpty()){
+        if (category.isEmpty()) {
             log.error("Category does not exist");
             throw new IllegalArgumentException("Такой категории нет");
         }
         return category.get();
     }
-    private void checkingExistingByIdAndUserId(Long id, Long userId){
-        if(!productRepository.existsByIdAndUserId(id, userId)){
+
+    private void checkingExistingByIdAndUserId(Long id, Long userId) {
+        if (!productRepository.existsByIdAndUserId(id, userId)) {
             log.error("Not found product with such product id");
             throw new IllegalArgumentException("У вас нет такого товара");
         }
