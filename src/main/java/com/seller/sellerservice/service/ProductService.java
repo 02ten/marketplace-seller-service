@@ -2,12 +2,16 @@ package com.seller.sellerservice.service;
 
 import com.seller.sellerservice.dto.ProductDTO;
 import com.seller.sellerservice.entity.Category;
+import com.seller.sellerservice.entity.Image;
 import com.seller.sellerservice.entity.Product;
 import com.seller.sellerservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +21,8 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
-
+    private final ImageService imageService;
+    @Transactional
     public Product createProduct(Long userId, ProductDTO productDTO) throws IllegalArgumentException {
         log.info("Creating new product");
         Category category = checkingNameProductAndExistingCategory(userId, productDTO);
@@ -27,9 +32,17 @@ public class ProductService {
         product.setDescription(productDTO.getDescription());
         product.setUserId(userId);
         product.setCategory(category);
+        try{
+            Image image = imageService.convertToImage(productDTO.getPreviewImage(), true, product);
+            product.setPreviewImageId(image.getId());
+            product.setImages(List.of(image));
+        }catch (IOException e){
+            log.error(e.getMessage());
+            product.setPreviewImageId(null);
+            product.setImages(null);
+        }
         log.info("Product created");
-        productRepository.save(product);
-        return product;
+        return productRepository.save(product);
     }
 
     public void deleteProduct(Long userId, Long productId) {
@@ -54,22 +67,22 @@ public class ProductService {
         log.info("Successful getting product by id");
         return productRepository.findProductByIdAndUserId(productId, userId);
     }
-
-    public Product updateProduct(Long userId, Long id, ProductDTO updatedProduct) throws IllegalArgumentException {
-        log.info("Updating product");
-        checkingExistingByIdAndUserId(id, userId);
-        Category category = checkingNameProductAndExistingCategory(userId, updatedProduct);
-        Product product = new Product(
-                id,
-                updatedProduct.getName(),
-                updatedProduct.getPrice(),
-                updatedProduct.getDescription(),
-                userId,
-                category
-        );
-        productRepository.save(product);
-        return product;
-    }
+//TODO
+//    public Product updateProduct(Long userId, Long id, ProductDTO updatedProduct) throws IllegalArgumentException {
+//        log.info("Updating product");
+//        checkingExistingByIdAndUserId(id, userId);
+//        Category category = checkingNameProductAndExistingCategory(userId, updatedProduct);
+//        Product product = new Product(
+//                id,
+//                updatedProduct.getName(),
+//                updatedProduct.getPrice(),
+//                updatedProduct.getDescription(),
+//                userId,
+//                category
+//        );
+//        productRepository.save(null);
+//        return null;
+//    }
 
     private Category checkingNameProductAndExistingCategory(Long userId, ProductDTO productDTO) {
         if (productRepository.existsByNameAndUserId(productDTO.getName(), userId)) {

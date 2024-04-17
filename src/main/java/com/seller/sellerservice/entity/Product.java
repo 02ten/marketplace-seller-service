@@ -1,10 +1,13 @@
 package com.seller.sellerservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "t_product")
@@ -23,16 +26,9 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "product")
+    private List<Image> images;
+    private Long previewImageId;
 
-    @Override
-    public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", description='" + description + '\'' +
-                ", userId=" + userId +
-                ", category=" + category +
-                '}';
-    }
 }
